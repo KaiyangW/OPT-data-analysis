@@ -32,7 +32,7 @@ fft_df = pd.read_excel(fft_file_path, sheet_name=fft_sheet_name)
 
 # Process the last 1000 rows and find the mean of the smallest n values in each column
 last_1000_rows = fft_df.tail(500)
-in_delf_data = last_1000_rows.apply(lambda x: np.mean(x.nsmallest(1)), axis=0).values[1:5]
+in_delf_data = last_1000_rows.apply(lambda x: np.mean(x.nsmallest(20)), axis=0).values[1:5]
 
 # Define constants
 A = 3e-8  # m^2
