@@ -19,7 +19,6 @@ length = 30
 width = 1000
 capacitance = 5E-9  # PMMA and Teflon
 
-# Initialize an empty DataFrame to hold all the data
 all_data = pd.DataFrame()
 
 # Function to perform natural sorting
@@ -73,14 +72,12 @@ def process_file(file_path, intensity):
             abs_ID1 = df['DrainI(1)'].abs() if 'DrainI(1)' in df.columns else abs_ID2
             V_G = df['GateV(2)']
             
-            # Ensure GateV(2) values are sorted and unique
             V_G, unique_indices = np.unique(V_G, return_index=True)
             abs_ID2 = abs_ID2.iloc[unique_indices] if abs_ID2 is not None else None
             abs_ID1 = abs_ID1.iloc[unique_indices]
             VD = VD.iloc[unique_indices]
             
             if abs_ID2 is not None:
-                # Calculate sqrt(abs_ID2)
                 sqrt_abs_ID2 = np.sqrt(abs_ID2)
                 
                 # Find the steepest slope using linear regression on segments for sqrt(abs_ID2)
@@ -132,7 +129,6 @@ def process_file(file_path, intensity):
             if intensity == 0:
                 power_density = 0
             
-            # Append the result to the DataFrame
             result = pd.DataFrame({
                 'Power Density': [power_density],
                 'Sat. Mobility': [sat_mobility],
@@ -157,7 +153,6 @@ for file_name in files_to_process:
     file_path = os.path.join(folder_path, file_name)
     
     if "dark" in file_name.lower():
-        # Process the dark file
         result = process_dark_file(file_path)
     else:
         # Extract intensity from the file name
@@ -177,13 +172,12 @@ else:
     print("No data to save.")
 
 def plot_results(df):
-    # Extract data
     power_density = df['Power Density']
     sat_mobility = df['Sat. Mobility']
     lin_mobility = df['Lin. Mobility']
     threshold_voltage = df['Threshold Voltage']
     
-    # Calculate Z-scores
+    # Filer out some unwanted outlier results
     z_scores_sm = zscore(sat_mobility)
     z_scores_lm = zscore(lin_mobility)
     z_scores_tv = zscore(threshold_voltage)
@@ -191,7 +185,6 @@ def plot_results(df):
     # Define a threshold for Z-score to identify outliers
     threshold = 3
     
-    # Filter out outliers
     filtered_sm = sat_mobility[np.abs(z_scores_sm) < threshold]
     filtered_power_density_sm = power_density[np.abs(z_scores_sm) < threshold]
     
@@ -201,10 +194,9 @@ def plot_results(df):
     filtered_tv = threshold_voltage[np.abs(z_scores_tv) < threshold]
     filtered_power_density_tv = power_density[np.abs(z_scores_tv) < threshold]
     
-    # Create figure and axis objects
     fig, ax = plt.subplots(3, 1, figsize=(10, 12))
 
-    # Plot saturation mobility (blue) without outliers
+    # Plot saturation mobility
     ax[0].semilogx(filtered_power_density_sm, filtered_sm, 'o-', color='blue', label='Saturation Mobility')
     ax[0].set_ylabel(r'$\mu_{sat}$ (cm$^2$ V$^{-1}$ s$^{-1}$)', fontsize=20)
     ax[0].grid(False)
@@ -215,7 +207,7 @@ def plot_results(df):
     margin_sm = (y_max_sm - y_min_sm) * 0.05
     ax[0].set_ylim(y_min_sm - margin_sm, y_max_sm + margin_sm)
     
-    # Plot linear mobility (red) without outliers
+    # Plot linear mobility
     ax[1].semilogx(filtered_power_density_lm, filtered_lm, 'o-', color='red', label='Linear Mobility')
     ax[1].set_ylabel(r'$\mu_{lin}$ (cm$^2$ V$^{-1}$ s$^{-1}$)', fontsize=20)
     ax[1].grid(False)
@@ -226,7 +218,7 @@ def plot_results(df):
     margin_lm = (y_max_lm - y_min_lm) * 0.05
     ax[1].set_ylim(y_min_lm - margin_lm, y_max_lm + margin_lm)
     
-    # Plot threshold voltage (green) without outliers
+    # Plot threshold voltage
     ax[2].semilogx(filtered_power_density_tv, filtered_tv, 'o-', color='black', label='Threshold Voltage')
     ax[2].set_ylabel(r'$V_{th}$ (V)', fontsize=20)
     ax[2].grid(False)
