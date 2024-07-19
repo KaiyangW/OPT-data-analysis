@@ -54,28 +54,19 @@ gateV_1 = data_dark["GateV(1)"] if "GateV(1)" in data_dark.columns else data_dar
 
 # Check if the required columns are available for plotting
 if drainI_1 is not None and gateV_1 is not None:   
-    # Define a shift factor to move the curves downwards on the log scale
-    shift_factor = 1.15
-
-    # Apply the shift factor for y-axis
-    drainI_1_shifted = drainI_1 / shift_factor
-
-    # Create a new DataFrame with the shifted data
+    drainI_1_shifted = drainI_1
     shifted_data = {
         "GateV(1)": gateV_1,
         "DrainI(1)": -1 * drainI_1_shifted,
     }
 
     if drainI_2 is not None:
-        drainI_2_shifted = drainI_2 / shift_factor
+        drainI_2_shifted = drainI_2
         shifted_data["DrainI(2)"] = -1 * drainI_2_shifted
 
     # Convert the dictionary to a DataFrame for further processing
     shifted_data_df = pd.DataFrame(shifted_data)
-
-    # Save the shifted data to a new Excel file
     shifted_data_df.to_excel(dark_save_path, index=False)
-
     print(f"Optimized data has been saved to: {dark_save_path}")
 else:
     print("Error: Required columns are not available in the Excel file.")
