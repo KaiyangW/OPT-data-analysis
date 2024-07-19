@@ -60,8 +60,6 @@ for file_idx, file_path in enumerate(file_paths, start=1):
     # Convert to Noise Spectral Density
     nsd = np.sqrt(psd)
 
-    nsd = nsd / 5
-
     # Store the results in a DataFrame for saving
     vg_value = os.path.basename(file_path).split()[2]  # Adjust the index based on the file naming convention
     if ' p' in file_path:
