@@ -5,13 +5,14 @@ import numpy as np
 from scipy.stats import linregress
 
 # Define the path to the folder containing the Excel files
-folder_path = r"C:\My files\Imperial-local\data\QIDT QIDS\PFBT 10 mins Teflon\June 25th\for mobility"
-output_file = r"C:\My files\Imperial-local\data\Python save path\QIDS PFBT-m.xlsx"
+folder_path = r"C:\My files\Imperial-local\data\QIDT QIDS\QIDT\PEI 25 July"
+output_file = r"C:\My files\Imperial-local\data\Python save path\QIDT-PEI-m.xlsx"
 
 # Device parameters
 length = 30
 width = 1000
 capacitance = 5E-9  # PMMA and Teflon
+n=7
 
 # Initialize empty DataFrames to hold the data for 'p' and 'n' types
 all_data_p = pd.DataFrame()
@@ -35,10 +36,12 @@ def process_file(file_path, slope_type):
         
         # Strip any whitespace from column names
         df.columns = df.columns.str.strip()
+
+        drain_i_n = f'DrainI({n})'
         
         # Check if the required columns are present
-        if 'DrainI(2)' in df.columns and 'GateV(2)' in df.columns and 'DrainI(1)' in df.columns and 'GateV(1)' in df.columns and 'DrainV(1)' in df.columns:
-            abs_ID2 = df['DrainI(2)'].abs()
+        if drain_i_n in df.columns and 'GateV(2)' in df.columns and 'DrainI(1)' in df.columns and 'GateV(1)' in df.columns and 'DrainV(1)' in df.columns:
+            abs_ID2 = df[drain_i_n].abs()
             abs_ID1 = df['DrainI(1)'].abs()
             V_G2 = df['GateV(2)']
             V_G1 = df['GateV(1)']
