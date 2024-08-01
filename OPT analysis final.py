@@ -5,34 +5,33 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import UnivariateSpline
 
-transport_type = "n"
+transport_type = "p"
 
 # Define OPT folder paths
-folder_path = r"C:\My files\Imperial-local\data\OPT data\QIDS - OPT\PEI Teflon"
-output_file = r"C:\My files\Imperial-local\data\Python save path\QIDS-PEI-{}.xlsx".format(transport_type)
+folder_path = r"C:\My files\Imperial-local\data\OPT data\QIDS - OPT\QIDS OPT white\{}".format(transport_type)
+output_file = r"C:\My files\Imperial-local\data\Python save path\QIDS white {}.xlsx".format(transport_type)
 
 # Define dark current paths
-dark_file_path = r"C:\My files\Imperial-local\data\OPT data\QIDS - OPT\PEI Teflon\dark\dark 2-1 n.xls"
+dark_file_path = r"C:\My files\Imperial-local\data\OPT data\QIDS - OPT\QIDS OPT white\dark 2-1 p.xls"
 dark_save_path = os.path.join(folder_path, "0 dark.xlsx")
 
 # Get the power density data, choose 1100nm or 780nm
 # eopt_file = r"C:\My files\Imperial-local\data\OPT data\E_opt for Python 1100nm.xlsx"
-eopt_file = r"C:\My files\Imperial-local\data\OPT data\E_opt for Python 780nm.xlsx" 
+# eopt_file = r"C:\My files\Imperial-local\data\OPT data\E_opt for Python 780nm.xlsx"
+eopt_file = r"C:\My files\Imperial-local\data\OPT data\E_opt for Python white.xlsx" 
 
 # Extract Responsivity values at specific V_G values
 
-target_vg_values_p = [-25, -40, -60, -80] # p
-# target_vg_values_n = [25, 40, 60, 80] #n
+# target_vg_values_p = [-30, -40, -60, -80] # p
+# target_vg_values_n = [5, 10, 30, 40, 60, 80] #n
 
-# target_vg_values_p = [-5, -20, -50, -80] # p
+# target_vg_values_p = [-30, -40, -60, -80] # p
+# target_vg_values_n = [30, 40, 60, 80] #n
+
+target_vg_values_p = [-5, -20, -50, -80] # p
 target_vg_values_n = [5, 20, 50, 80] #n
 
 responsivity_at_vg = {}
-
-if transport_type == 'n':
-    target_vg_values = target_vg_values_n
-else:
-    target_vg_values = target_vg_values_p
 
 # Device area a: 30um * 1000um, change if it's 40um TFTs
 a = 3e4
@@ -47,26 +46,26 @@ for col in expected_columns:
     if col not in data_dark.columns:
         print(f"Warning: Column '{col}' not found in the Excel file.")
 
-# Extract the necessary columns and compute absolute values, if they exist
+# Extract the necessary columns and compute absolute values
 drainI_1 = data_dark["DrainI(1)"].abs() if "DrainI(1)" in data_dark.columns else data_dark["DrainI"].abs() if "DrainI" in data_dark.columns else None
 drainI_2 = data_dark["DrainI(2)"].abs() if "DrainI(2)" in data_dark.columns else None
-gateV_1 = data_dark["GateV(1)"] if "GateV(1)" in data_dark.columns else data_dark["GaveV"] if "GateV" in data_dark.columns else None
+gateV_1 = data_dark["GateV(1)"] if "GateV(1)" in data_dark.columns else data_dark["GateV"] if "GateV" in data_dark.columns else None
 
 # Check if the required columns are available for plotting
-if drainI_1 is not None and gateV_1 is not None:   
-    drainI_1_shifted = drainI_1
-    shifted_data = {
+if drainI_1 is not None and gateV_1 is not None:  
+    drainI_1_dark = drainI_1
+    dark_data = {
         "GateV(1)": gateV_1,
-        "DrainI(1)": -1 * drainI_1_shifted,
+        "DrainI(1)": drainI_1_dark,
     }
 
     if drainI_2 is not None:
-        drainI_2_shifted = drainI_2
-        shifted_data["DrainI(2)"] = -1 * drainI_2_shifted
+        drainI_2_dark = drainI_2
+        dark_data["DrainI(2)"] = drainI_2_dark
 
     # Convert the dictionary to a DataFrame for further processing
-    shifted_data_df = pd.DataFrame(shifted_data)
-    shifted_data_df.to_excel(dark_save_path, index=False)
+    dark_data_df = pd.DataFrame(dark_data)
+    dark_data_df.to_excel(dark_save_path, index=False)
     print(f"Optimized data has been saved to: {dark_save_path}")
 else:
     print("Error: Required columns are not available in the Excel file.")
@@ -98,8 +97,8 @@ power_values = [
 power_to_Eopt = dict(zip(power_values, Eopt_values))
 
 # Separate dark current files and illumination files
-dark_files = [f for f in files_to_process if 'dark' in f.lower()]
-illumination_files = [f for f in files_to_process if 'dark' not in f.lower()]
+dark_files = [f for f in files_to_process if '0 dark' in f.lower()]
+illumination_files = [f for f in files_to_process if '0 dark' not in f.lower()]
 
 # Process dark current files first
 dark_current = None
