@@ -36,8 +36,9 @@ responsivity_at_vg = {}
 # Device area a: 30um * 1000um, change if it's 40um TFTs
 a = 3e4
 
-# Process the individual file to generate "0 dark.xlsx"
+# Process the individual file (xls) to generate "0 dark.xlsx"
 data_dark = pd.read_excel(dark_file_path, engine='xlrd')
+# data_dark = pd.read_excel(dark_file_path, engine='openpyxl') # when file type is in xlsx
 
 # Check for the exact column names
 expected_columns = ["DrainI(1)", "DrainI(2)", "GateV(1)", "DrainI"]
